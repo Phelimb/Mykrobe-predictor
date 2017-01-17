@@ -1,7 +1,5 @@
 from __future__ import print_function
 import logging
-logger = logging.getLogger(__name__)
-
 from pprint import pprint
 import json
 import os
@@ -114,10 +112,6 @@ def run(parser, args):
                 os.path.dirname(__file__),
                 "..",
                 hierarchy_json_file))
-    if args.ont:
-        args.expected_error_rate = 0.15
-        logger.debug("Setting expected error rate to %s (--ont)" % args.expected_error_rate)    
-
     # Run Cortex
     cp = CoverageParser(
         sample=args.sample,
@@ -176,7 +170,6 @@ def run(parser, args):
     sequence_calls_dict = {}
     if depths:
         gt = Genotyper(sample=args.sample, expected_depths=depths,
-                       expected_error_rate=args.expected_error_rate,
                        variant_covgs=cp.variant_covgs,
                        gene_presence_covgs=cp.covgs["presence"],
                        base_json=base_json,
@@ -198,8 +191,7 @@ def run(parser, args):
                               called_genes=gt.sequence_calls_dict,
                               base_json=base_json[args.sample],
                               depth_threshold=args.min_depth,
-                              ignore_filtered=True,
-                              ignore_minor_calls=args.ont)
+                              ignore_filtered=True)
         mykrobe_predictor_susceptibility_result = predictor.run()
     base_json[
         args.sample] = MykrobePredictorResult(

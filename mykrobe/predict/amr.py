@@ -49,7 +49,7 @@ def is_filtered(call):
 
 class BasePredictor(object):
 
-    def __init__(self, variant_calls, called_genes, base_json={}, depth_threshold=3, ignore_filtered=True, ignore_minor_calls=False):
+    def __init__(self, variant_calls, called_genes, base_json={}, depth_threshold=3, ignore_filtered=True):
         self.variant_calls = variant_calls
         self.called_genes = called_genes
         self.drugs = self._get_drug_list_from_variant_to_resistance_drug()
@@ -71,7 +71,6 @@ class BasePredictor(object):
         }
         self.depth_threshold = depth_threshold
         self.ignore_filtered = ignore_filtered
-        self.ignore_minor_calls = ignore_minor_calls
 
     def _create_initial_resistance_prediction(self):
         self.result = MykrobePredictorSusceptibilityResult(dict(
@@ -174,7 +173,7 @@ class BasePredictor(object):
         elif sum(variant_or_gene.get('genotype')) == 1:
             if (is_filtered(variant_or_gene) and self.ignore_filtered) or depth_on_alternate(variant_or_gene) < self.depth_threshold:
                 __resistance_prediction = "N"
-            elif self._coverage_greater_than_threshold(variant_or_gene, names) and not self.ignore_minor_calls:
+            elif self._coverage_greater_than_threshold(variant_or_gene, names):
                 __resistance_prediction = "r"
             else:
                 __resistance_prediction = "S"
@@ -205,7 +204,7 @@ def load_json(f):
 
 class TBPredictor(BasePredictor):
 
-    def __init__(self, variant_calls, called_genes, base_json={}, depth_threshold=3, ignore_filtered=True, ignore_minor_calls=False):
+    def __init__(self, variant_calls, called_genes, base_json={}, depth_threshold=3, ignore_filtered=True):
 
         self.data_dir = os.path.abspath(
             os.path.join(
@@ -222,13 +221,12 @@ class TBPredictor(BasePredictor):
             called_genes,
             base_json,
             depth_threshold=depth_threshold,
-            ignore_filtered=ignore_filtered,
-            ignore_minor_calls=ignore_minor_calls)
+            ignore_filtered=ignore_filtered)
 
 
 class StaphPredictor(BasePredictor):
 
-    def __init__(self, variant_calls, called_genes, base_json={}, depth_threshold=3, ignore_filtered=True, ignore_minor_calls=False):
+    def __init__(self, variant_calls, called_genes, base_json={}, depth_threshold=3, ignore_filtered=True):
 
         self.data_dir = os.path.abspath(
             os.path.join(
@@ -245,13 +243,12 @@ class StaphPredictor(BasePredictor):
             called_genes,
             base_json,
             depth_threshold=depth_threshold,
-            ignore_filtered=ignore_filtered,
-            ignore_minor_calls=ignore_minor_calls)
+            ignore_filtered=ignore_filtered)
 
 
 class GramNegPredictor(BasePredictor):
 
-    def __init__(self, variant_calls, called_genes, base_json={}, depth_threshold=3, ignore_filtered=True, ignore_minor_calls=False):
+    def __init__(self, variant_calls, called_genes, base_json={}, depth_threshold=3, ignore_filtered=True):
         self.data_dir = os.path.abspath(
             os.path.join(
                 os.path.dirname(__file__),
@@ -267,5 +264,4 @@ class GramNegPredictor(BasePredictor):
             called_genes,
             base_json,
             depth_threshold=depth_threshold,
-            ignore_filtered=ignore_filtered,
-            ignore_minor_calls=ignore_minor_calls)
+            ignore_filtered=ignore_filtered)
